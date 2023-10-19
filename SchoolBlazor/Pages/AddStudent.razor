@@ -1,0 +1,42 @@
+﻿@page "/add"
+@inject HttpClient Http
+@inject HttpClient httpClient
+@inject NavigationManager NavManager
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+@if (students != null) // Insert form 
+{
+<EditForm Model="@student" OnValidSubmit="@HandleAdd">
+  <DataAnnotationsValidator />
+  <ValidationSummary />
+
+  <InputText placeholder="First Name" id="firstName" @bind-Value="@student.FirstName" />
+  <br />
+  <InputText placeholder="Last Name" id="lastName" @bind-Value="@student.LastName" />
+  <br />
+  <InputText placeholder="School" id="school" @bind-Value="@student.School" />
+  <br />
+  <button type="submit">Submit</button>
+</EditForm>
+
+@code {
+  private Student student = new Student();
+  private Student[]? students;
+
+  private async void HandleAdd() {
+        string endpoint = $"{SchoolBlazor.Constants.baseUrl}api/students";
+
+        await httpClient.PostAsJsonAsync(endpoint, student);
+
+        NavManager.NavigateTo("/students");
+    }
+
+    protected override async Task OnInitializedAsync() {
+        students = await Http.GetFromJsonAsync<Student[]>($"{SchoolBlazor.Constants.baseUrl}api/students");
+    }
+}
+}
+
